@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <title>Video Player</title>
+  </head>
+  
+  <body class='bg-black'>
+    <div class=' flex items-center justify-center max-w-[1200px] mx-auto'>
+      <div class='w-full'>
+        {% extends "navbar.html" %} {% block content %}
+      </div>
+    </div>
+    {% include "search_bar.html" %}
+    
+    <div class='text-white flex flex-col items-center text-left
+      gap-4 mt-4'>
+      <h1 class="text-[#b3aca2]">Watching {{context['anime_name']}} Episode: <span class="episode-num">{{context['ep_id']}}</span></h1>
+      <h1 class="text-[#b3aca2]">Total Episodes: <span class="total-episode-num">{{context['episodes']}}</span></h1>
+    </div>
+
+    <div class="anime_video_body_watch_items load flex items-center
+      justify-center p-10">
+      <div class="play-video">
+        <iframe src={{context['video_feed']}} class="w-[1300px] h-[800px] border-4
+          border-red-600 overflow-hidden" allowfullscreen="true"></iframe>
+      </div>
+      
+    </div>
+
+    <div class="flex justify-center items-center mb-5">
+      <nav aria-label="Page navigation">
+        <ul class="flex list-style-none text-white">
+          <li class="page-item"><a
+              class="page-link relative block py-1.5 px-3 rounded border-0 bg-transparent outline-none transition-all duration-300 rounded text-white hover:text-red-500 focus:shadow-none"
+              href="#">Prev</a></li>
+          <li class="page-item-number flex gap-2 justify-center items-center "></li>
+          <li class="page-item"><a
+              class="page-link relative block py-1.5 px-3 rounded border-0 bg-transparent outline-none transition-all duration-300 rounded text-white hover:text-red-500 hover:bg-gray-200 focus:shadow-none"
+              href="#">Next</a></li>
+        </ul>
+      </nav>
+    </div>
+    
+       <div class='flex flex-col items-center justify-center p-6'>
+        <div class='grid grid-cols-12 gap-6 '>
+          {% for i in range (1,context['ep_id']+1) %}
+            <a href={{url_for('video',anime_name= context['anime_name'],ep_id=i)}} class="episodes">
+              <div>
+                <button class='bg-[#18191a] group text-white p-2 w-[60px] rounded-xl hover:bg-red-400 hover:text-black transition-all ease-in-out duration-400'>
+               <span class='text-gray-500 group-hover:text-white'>{{i}}</span>
+                </button>
+              </div>
+              </a>
+            {% endfor %}
+            {%  for i in range (context['ep_id']+1 , context['episodes']+1) %}
+            <a href={{url_for('video',anime_name= context['anime_name'],ep_id=i)}} class="episodes">
+              <div>
+                <button class='bg-[#18191a] group text-white w-[60px] p-2 rounded-xl hover:bg-red-400 hover:text-black transition-all ease-in-out duration-400'>
+                <span class='text-emerald-500 font-bold group-hover:text-white'>{{i}}</span>
+                </button>
+              </div>
+              </a>
+            {% endfor %}
+            </div>
+      </div>
+      </div>
+      {% include "footer.html" %}
+      <script src = '{{url_for('static',filename='scripts.js')}}'></script>
+     {% endblock %}
+  </body>
+</html>

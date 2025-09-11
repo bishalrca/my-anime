@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>My anime</title>
+
+</head>
+<style>
+  body{
+    background-image: url(../static/cover.jpg);
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+  .wrapper{
+    background-color: rgba(0, 0, 0, 0.52);
+    height: auto;
+  }
+</style>
+
+<body class="bg-black text-white">
+ <div class="wrapper">
+  <div class=' flex items-center justify-center max-w-[1200px] mx-auto'>
+    <div class='w-full'>
+      {% extends "navbar.html" %} {% block content %}
+    </div>
+  </div>
+
+ <div class="mt-[30vh] flex flex-col gap-3">
+  <h1 class="text-5xl text-center font-bold">ANIME<span class="bg-red-600 text-black">HUB</span></h1>
+  <h2 class="text-2xl text-center font-bold">Your one stop for all your anime needs.</h2>
+  <!-- make a button in red color -->
+
+  {% include "search_bar.html" %}
+ </div>
+
+  <div class="grid content-center justify-items-center w-screen max-w-[95%] lg:max-w-[1200px] mx-auto ">
+    <div class="grid lg:grid-cols-4 gap-10 grid-cols-2">
+      {% for i in context['season'] %}
+      <div id={{i.sanitize_name()}}
+        class="lg:w-[250px] w-[400px] border border-gray-700 h-auto shadow-xl hover:scale-110 transition-all ease-in-out duration-300 mt-5 hover:rounded-xl bg-[#18191a]">
+        <article class="group">
+          <img alt="Lava" src="{{i.img_url}}"
+            class="h-56 w-full object-cover shadow-xl transition-all group-hover:grayscale-[50%] group-hover:rounded-t-xl ease-in-out duration-300" />
+
+          <div class="p-4">
+
+            <a href={{url_for('info',name=i.title)}}>
+              <h3 class="text-lg font-medium text-white overflow-hidden max-h-[52px]">{{i.title}}</h3>
+
+            </a>
+
+            <div class='flex justify-between items-center pt-2'>
+              <p class="mt-2 text-sm leading-relaxed text-white line-clamp-3">
+
+                Episodes: {{i.episodes}}
+
+              </p>
+              
+              {% if i.title not in context['following_list'] %}
+              <a href={{url_for ('follow',name=i.title)}}
+                class="button mt-2 text-sm font-medium text-green-500 hover:text-green-400">Follow</a>
+              {% else %}
+
+              <a href={{url_for ('unfollow',name=i.title)}}
+                class="button mt-2 text-sm font-medium text-red-500 hover:text-red-400">Unfollow</a>
+
+
+              {% endif %}
+            </div>
+
+          </div>
+
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+ </div>
+  <div class="flex justify-center items-center">
+    {% include "footer.html" %}
+  </div>
+  {% endblock content %}
+
+
+
+
+</body>
+
+
+</html>

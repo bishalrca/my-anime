@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Following</title>
+    </head>
+    <style>
+        body{
+            background-image: url(https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80);
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .wrapper{
+            background-color: rgba(0, 0, 0, 0.505);
+            height: auto;
+            width: 100%;
+        }
+    </style>
+    <body class='bg-black text-white '>
+     <div class="wrapper">
+        <div class='flex items-center justify-center max-w-[1200px]
+        mx-auto'>
+        <div class='w-full'>
+            {% extends "navbar.html" %} {% block content %}
+        </div>
+    </div>
+    <div class="mt-[20vh]">
+        {% include "search_bar.html" %}
+    </div>
+    <h1 class="flex justify-center items-center text-5xl font-bold p-5">Followed
+        Animes</h1>
+
+    <div class="grid content-center justify-items-center w-screen card-tray
+        max-w-[95%] lg:max-w-[1200px] mx-auto pb-5">
+        <div class="grid lg:grid-cols-4 gap-10 grid-cols-2">
+            {% for anime in following_list %}
+            <div id={{anime.sanitize_name()}}
+                class="lg:w-[250px] w-[400px] border border-gray-600 h-auto
+                shadow-xl hover:scale-110 transition-all ease-in-out
+                duration-300 mt-5 hover:rounded-xl bg-[#18191a]">
+                <article class="group">
+                    <img alt="Lava" src="{{anime.img_url}}"
+                        class="h-56 w-full object-cover shadow-xl
+                        transition-all group-hover:grayscale-[50%]
+                        group-hover:rounded-t-xl ease-in-out duration-300"
+                        />
+                    <div class="p-4">
+                        <a href={{url_for('info',name=anime.title)}}>
+                            <h3 class="text-lg font-medium text-white
+                                overflow-hidden max-h-[52px]">{{anime.title}}</h3>
+                        </a>
+                        <div class='flex justify-between items-center pt-2'>
+                            <p class="mt-2 text-sm leading-relaxed
+                                text-white line-clamp-3">
+
+                                Watched: {{anime.watched_ep}}
+                            </p>
+                            
+                            <a href={{url_for('unfollow',name=anime.title)}}
+                                class="button mt-2 text-sm font-medium
+                                text-red-500 hover:text-red-400">Unfollow</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+     </div>
+     {% include "footer.html" %}
+        {% endblock content %}
+    </body>
+</html>

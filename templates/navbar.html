@@ -1,0 +1,27 @@
+{% block nav %}
+<!DOCTYPE html>
+<html>  
+    <head class=""> 
+        <title> My anime</title>
+         <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <header class="text-gray-600 body-font">
+  <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+    <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0" href={{url_for('index')}}>
+      <img src='{{url_for('static',filename='logo1.png')}}' class='w-[200px]'></img>
+    </a>
+    <nav class="md:ml-auto flex flex-wrap items-center text-white font-bold justify-center">
+      <a href  = {{url_for('index')}} class="mr-5 hover:text-red-600 cursor-pointer">Home</a>
+      <a href ={{url_for('following')}} class="mr-5 hover:text-red-600 cursor-pointer">Following</a>
+      <a class="mr-5 hover:text-red-600 cursor-pointer">About us</a>
+    </nav>
+    
+  </div>
+</header>
+        {%  block content %}
+        {% endblock content %}
+    </body>
+</html>
+
+{% endblock nav %}
