@@ -45,23 +45,41 @@ def search(query):
     
     return render_template("search.html",results = results,search_name = query,following_list = following_list)
         
-@app.route('/info/<string:name>',methods=['GET','POST'])
+@app.route('/info/<string:name>', methods=['GET', 'POST'])
 def info(name):
     following_list = get_following_list()
     last_watched_ep = get_last_watched_ep(name)
-    name = sanitize_name(name)
-    name = name.strip()
-    if request.method !="POST":
+
+    cleaned_name = sanitize_name(name)
+    print("DEBUG raw name:", name)
+    print("DEBUG cleaned name:", cleaned_name)
+
+    if request.method != "POST":
         try:
-            ctx = get_anime_info(name)
+            anime_obj = get_anime_info(cleaned_name)
+            print("DEBUG get_anime_info result:", anime_obj)
+
+            if not isinstance(anime_obj, dict):
+                ctx = vars(anime_obj)
+            else:
+                ctx = anime_obj
+
+            print("DEBUG ctx dict:", ctx)
+
             ctx['last_watched_ep'] = last_watched_ep
-            return render_template("anime_info.html",context = ctx,following_list= following_list)
-        except AttributeError:
+            ctx.setdefault('episodes', 0)
+
+            return render_template("anime_info.html", context=ctx, following_list=following_list)
+
+        except AttributeError as e:
+            print("DEBUG ERROR:", e)
             abort(404)
     else:
         query = request.form['search-query']
-        return redirect (url_for('search',query = query))
-        
+        return redirect(url_for('search', query=query))
+
+
+
 
 @app.route('/follow/<string:name>')
 def follow(name):
@@ -108,14 +126,24 @@ def video(anime_name , ep_id):
         
         return redirect (url_for('search',query = query))
 
-@app.route('/following',methods=['GET','POST'])
+@app.route('/following', methods=['GET', 'POST'])
 def following():
-    following_list= get_following_anime()
-    if request.method !="GET":
-        query= request.form['search-query']
-        return redirect(url_for('search',query = query))
-        
-    return render_template("following.html",following_list= following_list)
+    following_list = get_following_anime()  # list of Anime objects
+
+    if request.method != "GET":
+        query = request.form['search-query']
+        return redirect(url_for('search', query=query))
+
+    for anime in following_list:
+        try:
+            info = get_anime_info(sanitize_name(anime.title))
+            anime.img_url = info.get('img_url') or url_for('static', filename='default.jpg')
+        except Exception:
+            anime.img_url = url_for('static', filename='default.jpg')
+
+    return render_template("following.html", following_list=following_list)
+
+
 
 @app.errorhandler(404)
 def not_found(e):

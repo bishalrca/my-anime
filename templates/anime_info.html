@@ -1,141 +1,108 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title> Anime Info</title>
-  </head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ context.get('title', 'Anime Info') }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <style>
-    body{
-      background-image: url(../static/cover3.jpg);
+    body {
+      background-image: url({{ url_for('static', filename='cover3.jpg') }});
       background-repeat: no-repeat;
-      background-size: contain;
+      background-size: cover;
+      background-color: #000;
+      color: #fff;
     }
-    .wrapper{
-      background-color: rgba(0, 0, 0, 0.505);
-      height: auto;
-      width: screen;
+    .wrapper {
+      background-color: rgba(0, 0, 0, 0.5);
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 12px;
+    }
+    .anime-image {
+      height: 300px;
+      border: 4px solid #f00;
+      object-fit: cover;
+      transition: transform 0.4s ease-in-out;
+    }
+    .anime-image:hover {
+      transform: scale(1.1);
+    }
+    .button-follow {
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: none;
+      margin-left: 10px;
+    }
+    .button-follow:hover {
+      opacity: 0.8;
+    }
+    .episodes button {
+      width: 60px;
+      padding: 8px;
+      border-radius: 10px;
+      transition: all 0.4s ease-in-out;
+    }
+    .episodes button:hover {
+      background-color: #f00;
+      color: #000;
     }
   </style>
-
-  <body class='bg-black'>
-    <div class="wrapper">
-      <div class='flex items-center justify-center max-w-[1200px]
-      mx-auto'>
-      <div class='w-full'>
-        {% extends "navbar.html" %} {% block content %}
-      </div>
-    </div>
+</head>
+<body>
+  <div class="wrapper">
+    {% extends "navbar.html" %}
+    {% block content %}
+    
+    <!-- Search Bar -->
     <div class="mt-[20vh]">
       {% include "search_bar.html" %}
     </div>
-    <div class='max-w-[1200px] bg-[#18191a] rounded-xl p-8 mt-10 mx-auto flex
-      items-center justify-center mb-8'>
-      <div>
-        <article class="overflow-hidden bg-[#18191a] flex shadow transition
-          hover:shadow-lg">
 
-          <img
-            alt="Office"
-            src={{ context ['img_url'] }}
-            class="anime-image mt-10 mb-10 h-[300px] ml-6 object-cover border-[4px]
-            border-red-500 hover:scale-110 transition-all ease-in-out
-            duration-400"
-            />
+    <!-- Anime Info Card -->
+    <div class="bg-[#18191a] rounded-xl p-8 mt-10 flex flex-col md:flex-row items-start gap-8">
+      <img src="{{ context.img_url or url_for('static', filename='default.jpg') }}"
+          alt="{{ context.title or 'Anime' }}"
+          class="anime-image">
 
-          <div class="bg-[#18191a] text-white p-4 sm:p-6 ">
-
-            <div class='flex justify-between items-center'>
-              <a href="#">
-                <h3 class="mt-0.5 text-[30px] font-bold text-white">
-                  {{context['title']}}
-                </h3>
-              </a>
-              {% if context['title'] not in following_list %}
-              <a href={{url_for ('follow',name=context['title'])}}
-                class="button mt-2 text-xl font-medium text-green-500 hover:text-green-400">Follow</a>
-              {% else %}
-
-              <a href={{url_for ('unfollow',name=context['title'])}}
-                class="button mt-2 text-xl font-medium text-red-500 hover:text-red-400">Unfollow</a>
-
-
-              {% endif %}
-             
-            </div>
-
-            <p class="mt-2 mb-2 text-sm leading-relaxed text-white
-              line-clamp-3">
-
-              {{context['synopsis']}}
-
-            </p>
-
-            <ul class='flex items-center justify-between gap-5 py-6'>
-              <h3 class=" text-lg flex gap-5">
-                <span class='text-red-500'>Genre:</span> <span class='flex items-center justify-center gap-5'>
-                  {{context['genre']}}
-              </span>
-              </h3>
-              
-              <p class='text-red-400'>{{context['status']}}</p>
-            </ul>
-
-
-          </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="flex flex-col justify-center pt-10 items-center gap-6 mb-5">
-        
-        <div>
-          <div class="text-red-500 text-4xl font-bold">
-            Episodes
-          </div>
+      <div class="flex-1">
+        <div class="flex justify-between items-center mb-4">
+          <h1 class="text-3xl font-bold">{{ context.get('title', 'Unknown Title') }}</h1>
+          
+          {% if context.get('title') not in following_list %}
+            <a href="{{ url_for('follow', name=context.get('title')) }}" class="button-follow text-green-500">Follow</a>
+          {% else %}
+            <a href="{{ url_for('unfollow', name=context.get('title')) }}" class="button-follow text-red-500">Unfollow</a>
+          {% endif %}
         </div>
 
-        <nav aria-label="Page navigation">
-          <ul class="flex list-style-none text-white">
-            <li class="page-item"><a
-                class="page-link relative block py-1.5 px-3 rounded border-0 bg-transparent outline-none transition-all duration-300 rounded text-white hover:text-red-500 focus:shadow-none"
-                href="#">Prev</a></li>
-            <li class="page-item-number flex justify-center items-center gap-3"></li>
-            <li class="page-item"><a
-                class="page-link relative block py-1.5 px-3 rounded border-0 bg-transparent outline-none transition-all duration-300 rounded text-white hover:text-red-500 hover:bg-gray-200 focus:shadow-none"
-                href="#">Next</a></li>
-                
-          </ul>
-        </nav>
+        <p class="mb-4">{{ context.get('synopsis', 'No synopsis available.') }}</p>
+
+        <ul class="flex gap-6 mb-4">
+          <li><strong class="text-red-500">Genre:</strong> {{ context.get('genre', 'Unknown') }}</li>
+          <li><strong class="text-red-500">Status:</strong> {{ context.get('status', 'Unknown') }}</li>
+        </ul>
+
+        <!-- Episodes Section -->
+        <h2 class="text-2xl font-bold text-red-500 mb-4">Episodes</h2>
+        <div class="grid grid-cols-12 gap-3">
+          {% for i in range(1, context.get('last_watched_ep', 0) + 1) %}
+            <a href="{{ url_for('video', anime_name=context.get('title'), ep_id=i) }}" class="episodes">
+              <button class="bg-black text-white">{{ i }}</button>
+            </a>
+          {% endfor %}
+          {% for i in range(context.get('last_watched_ep', 0) + 1, context.get('episodes', 0) + 1) %}
+            <a href="{{ url_for('video', anime_name=context.get('title'), ep_id=i) }}" class="episodes">
+              <button class="bg-[#18191a] text-white">{{ i }}</button>
+            </a>
+          {% endfor %}
+        </div>
       </div>
-        
-      <div class='flex flex-col items-center justify-center p-6'>
-          
-        <div class='grid grid-cols-12 gap-7 '>
-          {% for i in range (1,context['last_watched_ep']+1) %}
-            <a href={{url_for('video',anime_name= context['title'],ep_id=i)}} class="episodes">
-              <div>
-                <button class='bg-black group text-white p-2 w-[60px] rounded-xl hover:bg-red-400 hover:text-black transition-all ease-in-out duration-400'>
-               <span class='text-gray-500 group-hover:text-white'>{{i}}</span>
-                </button>
-              </div>
-              </a>
-            {% endfor %}
-            {%  for i in range (context['last_watched_ep']+1 , context['episodes']+1) %}
-            <a href={{url_for('video',anime_name= context['title'],ep_id=i)}} class="episodes">
-              <div>
-                <button class='bg-[#18191a] group text-white w-[60px] p-2 rounded-xl hover:bg-red-400 hover:text-black transition-all ease-in-out duration-400'>
-                <span class='text-white group-hover:text-white'>{{i}}</span>
-                </button>
-              </div>
-              </a>
-            {% endfor %}
-            </div>
+    </div>
 
-    </div>
-    </div>
-   
     {% include "footer.html" %}
-    <script src = '{{url_for('static',filename='scripts.js')}}'></script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
     {% endblock content %}
-
-  </body>
+  </div>
+</body>
 </html>

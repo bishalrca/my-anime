@@ -50,11 +50,6 @@
             </a>
 
             <div class='flex justify-between items-center pt-2'>
-              <p class="mt-2 text-sm leading-relaxed text-white line-clamp-3">
-
-                Episodes: {{i.episodes}}
-
-              </p>
               
               {% if i.title not in context['following_list'] %}
               <a href={{url_for ('follow',name=i.title)}}
