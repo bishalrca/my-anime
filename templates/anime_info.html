@@ -47,62 +47,69 @@
       background-color: #f00;
       color: #000;
     }
+    .watched {
+      background-color: gray !important;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    {% extends "navbar.html" %}
-    {% block content %}
-    
-    <!-- Search Bar -->
-    <div class="mt-[20vh]">
-      {% include "search_bar.html" %}
-    </div>
+<div class="wrapper">
+  {% extends "navbar.html" %}
+  {% block content %}
 
-    <!-- Anime Info Card -->
-    <div class="bg-[#18191a] rounded-xl p-8 mt-10 flex flex-col md:flex-row items-start gap-8">
-      <img src="{{ context.img_url or url_for('static', filename='default.jpg') }}"
-          alt="{{ context.title or 'Anime' }}"
-          class="anime-image">
+  <!-- Search Bar -->
+  <div class="mt-[20vh]">
+    {% include "search_bar.html" %}
+  </div>
 
-      <div class="flex-1">
-        <div class="flex justify-between items-center mb-4">
-          <h1 class="text-3xl font-bold">{{ context.get('title', 'Unknown Title') }}</h1>
-          
-          {% if context.get('title') not in following_list %}
-            <a href="{{ url_for('follow', name=context.get('title')) }}" class="button-follow text-green-500">Follow</a>
-          {% else %}
-            <a href="{{ url_for('unfollow', name=context.get('title')) }}" class="button-follow text-red-500">Unfollow</a>
+  <!-- Anime Info Card -->
+  <div class="bg-[#18191a] rounded-xl p-8 mt-10 flex flex-col md:flex-row items-start gap-8">
+    <img src="{{ context.img_url or url_for('static', filename='default.jpg') }}"
+         alt="{{ context.title or 'Anime' }}"
+         class="anime-image">
+
+    <div class="flex-1">
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="text-3xl font-bold">{{ context.get('title', 'Unknown Title') }}</h1>
+
+        {% if context.get('title') not in following_list %}
+          <a href="{{ url_for('follow', name=context.get('title')) }}" class="button-follow text-green-500">Follow</a>
+        {% else %}
+          <a href="{{ url_for('unfollow', name=context.get('title')) }}" class="button-follow text-red-500">Unfollow</a>
+        {% endif %}
+      </div>
+
+      <p class="mb-4">{{ context.get('synopsis', 'No synopsis available.') }}</p>
+
+      <ul class="flex gap-6 mb-4">
+        <li><strong class="text-red-500">Genre:</strong> {{ context.get('genre', 'Unknown') }}</li>
+        <li><strong class="text-red-500">Status:</strong> {{ context.get('status', 'Unknown') }}</li>
+      </ul>
+
+      <!-- Episodes Section -->
+      <h2 class="text-2xl font-bold text-red-500 mb-4">Episodes</h2>
+      <div class="grid grid-cols-12 gap-3">
+        {% for ep in context.get('episode_links', []) %}
+          {% set ep_num_str = ep['num']|string %}
+          {% if ep['num'] % 1 != 0 %}
+            {% set ep_num_str = ep_num_str|replace('.', '-') %}
           {% endif %}
-        </div>
-
-        <p class="mb-4">{{ context.get('synopsis', 'No synopsis available.') }}</p>
-
-        <ul class="flex gap-6 mb-4">
-          <li><strong class="text-red-500">Genre:</strong> {{ context.get('genre', 'Unknown') }}</li>
-          <li><strong class="text-red-500">Status:</strong> {{ context.get('status', 'Unknown') }}</li>
-        </ul>
-
-        <!-- Episodes Section -->
-        <h2 class="text-2xl font-bold text-red-500 mb-4">Episodes</h2>
-        <div class="grid grid-cols-12 gap-3">
-          {% for i in range(1, context.get('last_watched_ep', 0) + 1) %}
-            <a href="{{ url_for('video', anime_name=context.get('title'), ep_id=i) }}" class="episodes">
-              <button class="bg-black text-white">{{ i }}</button>
-            </a>
-          {% endfor %}
-          {% for i in range(context.get('last_watched_ep', 0) + 1, context.get('episodes', 0) + 1) %}
-            <a href="{{ url_for('video', anime_name=context.get('title'), ep_id=i) }}" class="episodes">
-              <button class="bg-[#18191a] text-white">{{ i }}</button>
-            </a>
-          {% endfor %}
-        </div>
+          <a href="{{ url_for('video', anime_name=context['anime_name'], ep_num=ep_num_str) }}" class="episodes">
+            <button class="bg-[#18191a] text-white w-[60px] p-2 rounded-xl hover:bg-red-400 hover:text-black transition-all ease-in-out duration-300">
+              <span class="{% if ep['num'] <= context.get('last_watched_ep', 0) %}text-gray-500{% else %}text-emerald-500 font-bold{% endif %}">
+                {{ ep['num'] }}
+              </span>
+            </button>
+          </a>
+        {% endfor %}
       </div>
     </div>
-
-    {% include "footer.html" %}
-    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
-    {% endblock content %}
   </div>
+
+  {% include "footer.html" %}
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+  {% endblock content %}
+</div>
 </body>
 </html>
