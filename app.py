@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from gogoscraper import (get_anime_info, get_stream_url, sanitize_name, 
+from gogoscraper import (get_anime_info, get_stream_url, sanitize_name, scrape_anime,
                          get_search_results, get_home_page)
 from dbhandler import (follow_anime, unfollow_anime, get_following_list, 
                       get_last_watched_ep, update_watched_ep)
@@ -28,23 +28,26 @@ def index():
     
     return render_template('index.html', context=context)
 
-# Search route
-@app.route('/search')
+@app.route('/search', methods=['GET', 'POST'])
 def search():
-    query = request.args.get('query', '')
-    if not query:
-        return redirect(url_for('index'))
-    
-    search_results = get_search_results(query)
-    following_list = get_following_list()
-    
-    context = {
-        'results': search_results,
-        'query': query,
-        'following_list': following_list
-    }
-    
-    return render_template('search_results.html', context=context)
+    query = None
+    results = []
+
+    if request.method == 'POST':
+        query = request.form.get("search-query")
+    else:
+        query = request.args.get("q")
+
+    if query:
+        results = scrape_anime(query)
+
+    return render_template(
+        "search.html",
+        query=query,
+        results=results,
+        following_list=get_following_list()
+    )
+
 
 # Anime info route
 @app.route('/info/<name>')

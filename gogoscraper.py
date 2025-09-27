@@ -202,3 +202,37 @@ def get_iframe_from_url(episode_url):
     if video_url.startswith("//"):
         video_url = "https:" + video_url
     return video_url
+
+
+import requests
+from bs4 import BeautifulSoup
+
+def scrape_anime(query):
+    url = f"https://anitaku.io/?s={query.replace(' ', '+')}"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    r = requests.get(url, headers=headers)
+    r.raise_for_status()
+
+    soup = BeautifulSoup(r.text, "html.parser")
+    results = []
+
+    # anitaku puts search results inside divs with class "bsx"
+    for item in soup.select(".bsx"):
+        a_tag = item.select_one("a")
+        img_tag = item.select_one("img")
+
+        if not a_tag:
+            continue
+
+        title = a_tag.get("title") or a_tag.text.strip()
+        link = a_tag.get("href")
+        img_url = img_tag.get("src") if img_tag else ""
+
+        results.append({
+            "title": title,
+            "url": link,
+            "img_url": img_url,
+            "sanitize_name": lambda t=title: sanitize_name(t)
+        })
+
+    return results
